@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, Types} from "mongoose";
 
 export interface IToken extends Document {
-    toke: string
+    token: string
     user: Types.ObjectId
     createdAt: Date
 }
