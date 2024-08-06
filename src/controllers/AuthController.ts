@@ -3,7 +3,7 @@ import User from "../models/User"
 import { hashPassword } from "../utils/auth"
 import Token from "../models/Token"
 import { generateToken } from "../utils/token"
-import { transporter } from "../config/nodemailer"
+import { AuthEmail } from "../emails/AuthEmail"
 
 export class AuthController {
 
@@ -29,12 +29,10 @@ export class AuthController {
             token.user = user.id
 
             // Enviar Email
-            await transporter.sendMail({
-                from: 'UpTask <admin@uptask.com>',
-                to: user.email,
-                subject: 'UpTask - Confirma tu cuenta',
-                text: 'UpTask - Confirma tu cuenta',
-                html: `<p>Probando e-mail</p>`
+            AuthEmail.sendConfirmationEmail({
+                email: user.email,
+                name: user.name,
+                token: token.token
             })
 
             await Promise.allSettled([user.save(), token.save()])
