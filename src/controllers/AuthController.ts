@@ -1,6 +1,6 @@
 import type { Request, Response } from "express"
 import User from "../models/User"
-import { hashPassword } from "../utils/auth"
+import { checkPassword, hashPassword } from "../utils/auth"
 import Token from "../models/Token"
 import { generateToken } from "../utils/token"
 import { AuthEmail } from "../emails/AuthEmail"
@@ -89,6 +89,14 @@ export class AuthController {
                 const error = new Error('La cuenta no a sido confirmada hemos enviado un e-mail de confirmación')
                 return res.status(401).json({error: error.message})
             }
+
+            // Validar Password
+            const isPasswordCorrect = await checkPassword(password, user.password)
+            if(!isPasswordCorrect){
+                const error = new Error('El Password es incorrecto')
+                return res.status(401).json({error: error.message})
+            }
+            res.send('Autenticado...')
         } catch (error) {
             res.status(500).json({error: 'Hubo un error'})
         }
