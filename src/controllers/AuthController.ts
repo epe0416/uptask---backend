@@ -226,4 +226,24 @@ export class AuthController {
             res.status(500).send('Hubo un error')
         }
     }
+    static updateCurrentUserPassword = async (req: Request, res: Response) => {
+        const { current_password, password } = req.body
+
+        const user = await User.findById(req.user.id)
+
+        const isPasswordCurrent = await checkPassword(current_password, user.password)
+        if(!isPasswordCurrent) {
+            const error = new Error('El password actual es incorrecto')
+            return res.status(401).json({error: error.message})
+        }
+        
+        try {
+            user.password = await hashPassword(password)
+            await user.save()
+            res.send('El password se modifico correctamente')
+            
+        } catch (error) {
+            res.status(500).send('Hubo un error')
+        }
+    }
 }
